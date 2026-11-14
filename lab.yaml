@@ -1,0 +1,30 @@
+# Lima-Konfiguration der Lab-VM: Debian 13 (trixie), ARM64, Apple Virtualization.framework.
+# Reines Debian ohne Zusatzquellen im Basisimage; Image per SHA-512 gepinnt.
+minimumLimaVersion: 2.0.0
+
+vmType: vz
+arch: aarch64
+cpus: 3
+memory: 4GiB
+disk: 40GiB
+
+# "generic" (nicht "genericcloud"): enthält den normalen Debian-Kernel mit virtio-gpu/Input,
+# der Cloud-Kernel hat keine Grafiktreiber.
+images:
+- location: "https://cloud.debian.org/images/cloud/trixie/20261103-2651/debian-13-generic-arm64-20261103-2651.qcow2"
+  arch: aarch64
+  digest: "sha512:878f563f6c95af7fe1e8e51cd39470a1cdb570dddbee22377c85a347bce9d521d95f2cf0f825a38bc0a757889034fac6d83e932f04a3a122ab08cea68cc9ff8a"
+
+mountType: virtiofs
+mounts:
+- location: "~/LabShare"
+  mountPoint: /mnt/labshare
+  writable: true
+
+# Fenster der VM direkt über Apples Framework (kein X11/XQuartz auf dem Mac).
+video:
+  display: vz
+
+containerd:
+  system: false
+  user: false

@@ -1,0 +1,19 @@
+; Hallo-Labor: schreibt einen Text in Zeile 2 des LCDs. Zilog-Syntax, assembliert mit sjasmplus.
+;
+; Die ersten vier Bytes sind der Kopf für "recv" im Monitor: Zieladresse (2 Byte), Länge (2 Byte),
+; danach folgen die Daten. Das Programm liegt ab 2000h und braucht Erweiterungs-RAM
+; (Emulator: ./labcomp_emu -extmem 62256). Ohne Erweiterung nur 1000h-13FFh verwenden (org 1000h).
+
+disp_line2:	equ 40h			; Zeilenadressen des LCDs: 00h, 40h, 14h, 54h
+
+		org 2000h - 4
+		dw  begin, end - begin	; Kopf für recv
+
+begin:		ld a, disp_line2
+		ld hl, text
+		ld b, textend - text
+		rst 20h			; Monitor-Routine display_print: a = Zeilenadresse, hl = Text, b = Länge
+loop:		jr loop			; Programmende; mit Stop-Taste zurück in den Monitor
+text:		defm "Hallo Labor!"
+textend:
+end:
