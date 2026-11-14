@@ -41,6 +41,22 @@ clangd --version >/dev/null 2>&1 && pass "clangd" || fail "clangd"
 cppcheck --version >/dev/null 2>&1 && pass "cppcheck $(cppcheck --version)" || fail "cppcheck"
 [ -f /opt/logisim-evolution/logisim-evolution-5.0.0-all.jar ] && java -version >/dev/null 2>&1 && pass "Logisim + Java" || fail "Logisim"
 
+# 3a0. Browser: Chromium vorhanden, Standard-Browser, startet und rendert (headless)
+chromium --version >/dev/null 2>&1 && pass "$(chromium --version)" || fail "chromium"
+[ "$(xdg-settings get default-web-browser 2>/dev/null)" = chromium.desktop ] && pass "Standard-Browser: Chromium" || fail "Standard-Browser"
+dom="$(timeout 60 chromium --headless=new --no-sandbox --disable-gpu --dump-dom 'data:text/html,<p id=t>browser-ok</p>' 2>/dev/null || true)"
+grep -q 'browser-ok' <<<"$dom" && pass "Chromium rendert (headless)" || fail "Chromium headless"
+
+# 3a. KI-Werkzeuge
+export PATH="$PATH:/opt/node/bin:$HOME/.npm-global/bin:$HOME/.local/bin"
+for c in claude opencode qwen; do
+  v="$("$c" --version 2>/dev/null | head -1 || true)"
+  [ -n "$v" ] && pass "$c $v" || fail "$c nicht gefunden"
+done
+for e in anthropic.claude-code sst-dev.opencode qwenlm.qwen-code-vscode-ide-companion saoudrizwan.claude-dev github.copilot-chat; do
+  codium --list-extensions 2>/dev/null | grep -qix "$e" && pass "Erweiterung $e" || fail "Erweiterung $e"
+done
+
 # 3b. z88dk: C- und Assembler-Beispiel für TRS-80 und generisches Z80 übersetzen, zmac mit -j (wie trszog)
 tdir="$(mktemp -d)"
 cat > "$tdir/hello.c" <<'C'

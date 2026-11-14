@@ -49,6 +49,11 @@ Einstellungen über Umgebungsvariablen: `VM_NAME` (Standard `lab`), `LABCOMP_REP
   automatisch das Original **DeZog**
 - **Z80/8080-Assembler und -Compiler:** `sjasmplus` (aus gepinnten Quellen), `zmac` (George Phillips, aus
   Quellen), `pasmo`, SDCC, **z88dk** v2.5 (aus Quellen, inkl. zsdcc), `z80dasm`
+- **Browser:** Chromium (Debian), Standard-Browser. Google Chrome gibt es für Linux nur für x86_64, nicht für ARM64.
+- **KI-Werkzeuge:** Claude Code (offizieller Installer), OpenCode und Qwen Code (npm, jeweils aktuelle Version bei jedem Lauf) sowie die
+  VS-Code-Erweiterungen Claude Code, Cline, OpenCode, Qwen Code und GitHub Copilot Chat. **Standard ist Claude**: Claude Code öffnet in
+  der Seitenleiste, Copilot-Vorschläge sind ausgeschaltet (`github.copilot.enable` einschaltbar). Es werden keine Zugangsdaten abgelegt;
+  Anmeldung in der VM selbst (`claude`, `opencode auth login`, `qwen`, GitHub in der IDE).
 - **Weitere:** `galasm` (GAL16V8), AVR-Toolchain (`avr-gcc`, `avrdude`), Logisim-evolution (Schaltplan),
   `picocom`/`minicom`, clangd, cppcheck, Motif-Entwicklungspakete
 

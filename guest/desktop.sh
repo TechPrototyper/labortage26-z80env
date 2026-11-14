@@ -64,6 +64,15 @@ Terminal=false
 X-GNOME-Autostart-Phase=Initialization
 AUTO
 
+# Standard-Browser: Chromium (Debian). Google Chrome gibt es für Linux nur für x86_64, nicht für ARM64.
+xdg-settings set default-web-browser chromium.desktop >/dev/null 2>&1 || true
+mkdir -p "$HOME/.config/xfce4"
+if grep -q '^WebBrowser=' "$HOME/.config/xfce4/helpers.rc" 2>/dev/null; then
+  sed -i 's/^WebBrowser=.*/WebBrowser=chromium/' "$HOME/.config/xfce4/helpers.rc"
+else
+  echo 'WebBrowser=chromium' >> "$HOME/.config/xfce4/helpers.rc"
+fi
+
 # Workspace mit Projekt und Beispielen, damit beides in der IDE sichtbar ist
 cat > "$HOME/Lab.code-workspace" <<'WS'
 {
