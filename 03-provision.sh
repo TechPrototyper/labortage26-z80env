@@ -37,6 +37,9 @@ if [ "${TRSZOG:-auto}" != off ]; then
 fi
 [ "$have_trszog" = 1 ] || limactl shell --workdir / "$VM_NAME" -- rm -f /tmp/trszog.vsix
 
+log "z80asm aus dem Savannah-Git als Alternative (nichts wird überschrieben)"
+limactl shell --workdir / "$VM_NAME" -- sudo bash -s < "$LAB_DIR/guest/z80asm-git.sh"
+
 log "IDE-Erweiterungen (als $LAB_USER)"
 vm_sh bash -s < "$LAB_DIR/guest/user.sh"
 

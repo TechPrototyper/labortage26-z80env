@@ -17,8 +17,13 @@ IDE: Starter „Labcomp IDE“ öffnet `~/Lab.code-workspace` mit den drei Ordne
 
 ## Werkzeuge
 - **Z80/8080:** `sjasmplus`, `zmac` (George Phillips), `pasmo`, SDCC, **z88dk** v2.5 (inkl. zsdcc), `z80dasm`
-- **Adapter:** `/usr/local/bin/z80asm` ruft `sjasmplus` auf, damit das unveränderte Makefile des Projekts die Firmware übersetzt
-  (Debians `z80asm` versteht `ixl`/`ixh` und `add c` nicht)
+- **Welches `z80asm`?** Drei Varianten, nichts davon überschreibt etwas anderes:
+  - `z80asm` im PATH ist ein **Adapter**, der `sjasmplus` aufruft, damit das unveränderte Makefile die Firmware übersetzt.
+  - `z80asm-git` (`/opt/z80asm-git/bin/z80asm`, nicht im PATH) ist das **echte `z80asm`** aus dem Git-Repository von Savannah (Stand 1.9, Commit `0df4a46`, 16.03.2021).
+    Es versteht `inc ixl` & Co. und den unveränderten Makefile-Aufruf `z80asm -lfirmware.prn -o rom firmware.z8a`; die Firmware wird
+    byte-identisch zum Adapter (3632 Byte). Benutzen: `PATH=/opt/z80asm-git/bin:$PATH make`.
+  - `/usr/bin/z80asm` ist Debians Paket (Release 1.8 von 2009) und übersetzt die Firmware nicht (kennt `inc ixl` nicht).
+  Außerdem liefert z88dk ein eigenes `z80asm` mit (ganz hinten im PATH); es übersetzt die Firmware erst ohne die letzte Zeile `end`.
 - **Weitere:** `galasm` (GAL16V8), `avr-gcc`/`avrdude`, Logisim-evolution (Schaltplan), `picocom`/`minicom`, clangd, cppcheck
 - **Debugger:** trszog (Fork von DeZog mit TRS-80-Simulator), ohne Zugriff auf das private Repo das Original-DeZog
 

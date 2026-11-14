@@ -111,6 +111,12 @@ die Vertrauensabfrage („Restricted Mode“) ist in der Lab-VM abgeschaltet.
 - Die VM bekommt 3 CPUs, 4 GB RAM und 40 GB (sparse) Platte – anpassbar in `lab.yaml` vor dem ersten Lauf.
 - Dateien zwischen Mac und VM: `~/LabShare` auf dem Mac ist in der VM unter `/mnt/labshare` eingehängt.
 
+## Welches z80asm?
+
+`z80asm` im PATH ist ein Adapter, der `sjasmplus` aufruft. Als **Alternative** wird das echte `z80asm` aus dem Git-Repository von Savannah gebaut (`z80asm-git`,
+Version 1.9 vom 16.03.2021, nie als Release erschienen): Es versteht den unveränderten Makefile-Aufruf und liefert dieselbe Firmware (3632 Byte). Aufruf:
+`PATH=/opt/z80asm-git/bin:$PATH make`. Debians `z80asm` (Release 1.8 von 2009) übersetzt die Firmware nicht. Details: [`docs/VM.md`](docs/VM.md).
+
 ## Zurücksetzen
 
 ```bash

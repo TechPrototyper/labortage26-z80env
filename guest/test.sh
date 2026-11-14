@@ -13,6 +13,13 @@ make >build.log 2>&1 || { tail -30 build.log; fail "make"; }
 [ -s rom ] && pass "ROM assembliert ($(stat -c %s rom) Byte)" || fail "rom fehlt"
 [ "$(stat -c %s rom)" -le 4096 ] && pass "ROM passt in 4 KiB" || fail "ROM größer als 4 KiB"
 
+# 1b. Alternative: z80asm aus dem Savannah-Git (nicht im PATH) übersetzt die Firmware mit dem unveränderten Makefile-Aufruf
+#     und liefert dieselben Bytes wie der Adapter (sjasmplus)
+zt="$(mktemp -d)"; cp firmware.z8a "$zt/"
+(cd "$zt" && /opt/z80asm-git/bin/z80asm -lfirmware.prn -o rom-git firmware.z8a >/dev/null 2>&1) && cmp -s "$zt/rom-git" rom \
+  && pass "z80asm-git (Savannah): unveränderter Makefile-Aufruf, byte-identisch mit dem Adapter ($(stat -c %s rom) Byte)" || fail "z80asm-git"
+rm -rf "$zt"
+
 # 2. ROM ist gültiger Z80-Code: Reset-Vektor disassemblieren
 dis="$(z80dasm -g 0 rom 2>/dev/null)"
 grep -qE '^[[:space:]]+(ld|jp|jr|di|im)[[:space:]]' <<<"$dis" \
