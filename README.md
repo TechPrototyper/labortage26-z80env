@@ -66,7 +66,12 @@ cd ~/labcomp   # in der VM
 sjasmplus --nologo --dirbol --raw=hello.bin hello.z8a
 ```
 
-Die Datei dann im Emulator über die Taste `recv` und den Menüpunkt zum Empfangen aus einer Datei laden.
+Laden und starten im Emulator (so getestet, Programm läuft und schreibt „Hallo Labor!“ aufs LCD):
+
+1. `./labcomp_emu -extmem 62256` starten
+2. Taste **`recv`** drücken – der Monitor zeigt „receive“ und wartet
+3. Menü **File → Receive from File…**, Pfad zu `hello.bin` eingeben, **Ok** (erst *nach* `recv`, sonst geht die Datei verloren)
+4. Der Monitor zeigt den empfangenen Speicher ab `2000h`; Taste **`go`** startet das Programm
 
 ## Bekannte Besonderheiten
 
