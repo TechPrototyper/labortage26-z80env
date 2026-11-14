@@ -61,8 +61,10 @@ Der Labcomp hat 4 KiB ROM (Monitor ab `0000h`), 1 KiB RAM ab `1000h` und optiona
 [`examples/hello.z8a`](examples/hello.z8a) schreibt einen Text auf das LCD und beginnt mit dem Kopf, den die
 `recv`-Funktion des Monitors erwartet (Zieladresse, Länge, Daten):
 
+Die Beispiele liegen in diesem Repo im Ordner `examples/` und werden von `04-repo.sh` in die VM nach `~/examples` kopiert:
+
 ```bash
-cd ~/labcomp   # in der VM
+cd ~/examples   # in der VM
 sjasmplus --nologo --dirbol --raw=hello.bin hello.z8a
 ```
 
