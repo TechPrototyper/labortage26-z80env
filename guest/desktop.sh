@@ -79,7 +79,7 @@ cat > "$HOME/Lab.code-workspace" <<'WS'
   "folders": [
     { "name": "code (liegt auf dem Mac)", "path": "Projects/labortage/code" },
     { "name": "labcomp (Projekt)", "path": "Projects/labortage/labcomp" },
-    { "name": "examples (Beispiele)", "path": "Projects/labortage/labortage26-z80env/examples" }
+    { "name": "labortage26-z80env (Skripte, examples/)", "path": "Projects/labortage/labortage26-z80env" }
   ]
 }
 WS

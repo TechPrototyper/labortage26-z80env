@@ -31,6 +31,21 @@ clone_or_pull() { # url dir
 }
 clone_or_pull "$1" "$base/labcomp"
 clone_or_pull "$2" "$base/labortage26-z80env"
+# Altlasten früherer Skriptversionen (~/labcomp, ~/examples im Home) entfernen, aber nur, wenn nichts Eigenes drinsteckt
+if [ -d "$HOME/labcomp/.git" ]; then
+  if [ -z "$(git -C "$HOME/labcomp" status --porcelain)" ] && [ -z "$(git -C "$HOME/labcomp" log '@{u}..HEAD' 2>/dev/null)" ]; then
+    rm -rf "$HOME/labcomp"; echo "  -> ~/labcomp (unverändert, liegt jetzt unter Projects/labortage) entfernt"
+  else
+    echo "  !! ~/labcomp hat lokale Änderungen - nicht gelöscht, bitte prüfen" >&2
+  fi
+fi
+if [ -d "$HOME/examples" ]; then
+  if diff -r "$HOME/examples" "$base/labortage26-z80env/examples" >/dev/null 2>&1; then
+    rm -rf "$HOME/examples"; echo "  -> ~/examples (Kopie der Beispiele) entfernt"
+  else
+    echo "  !! ~/examples weicht von den Beispielen im Repo ab - nicht gelöscht, bitte prüfen" >&2
+  fi
+fi
 # Verknüpfung auf den Mac-Ordner (virtiofs-Mount /mnt/labshare)
 ln -sfn /mnt/labshare/code "$base/code"
 [ -d "$base/code" ] || { echo "  !! $base/code zeigt ins Leere - ist der Mount /mnt/labshare vorhanden?" >&2; exit 1; }

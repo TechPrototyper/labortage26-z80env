@@ -84,7 +84,7 @@ cd ~/Projects/labortage/code   # in der VM
 sjasmplus --nologo --dirbol --raw=hello.bin hello.z8a
 ```
 
-Die IDE-Starter öffnen den Workspace `~/Lab.code-workspace` mit den drei Ordnern `code`, `labcomp` und `examples`. In `code/`
+Die IDE-Starter öffnen den Workspace `~/Lab.code-workspace` mit den drei Ordnern `code`, `labcomp` und `labortage26-z80env` (das Skript-Repo samt `examples/`). In `code/`
 baut **Strg+Shift+B** die gerade geöffnete `.z8a`-Datei mit sjasmplus (Fehler erscheinen im Problems-Panel).
 
 Laden und starten im Emulator (so getestet, Programm läuft und schreibt „Hallo Labor!“ aufs LCD):
