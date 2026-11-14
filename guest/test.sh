@@ -59,6 +59,9 @@ tdir2="$(mktemp -d)"
 [ -f "$HOME/Lab.code-workspace" ] && pass "Workspace-Datei vorhanden" || fail "Workspace-Datei"
 rm -rf "$tdir2"
 
+zoom_out="$("$HOME/.local/bin/labzoom" bogus 2>&1 || true)"
+grep -q usage <<<"$zoom_out" && pass "labzoom vorhanden" || fail "labzoom"
+
 # 4. Emulator startet unter virtuellem X-Server, läuft stabil und reagiert auf Tastendruck:
 #    LCD-Ausschnitt vor/nach Klick auf "PC" muss sich unterscheiden (Firmware läuft im Emulator).
 cat > /tmp/emu-ui-test.sh <<'UI'

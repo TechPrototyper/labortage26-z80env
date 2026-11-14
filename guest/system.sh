@@ -13,7 +13,7 @@ mkdir -p /var/lib/lab
 REQUIRED="build-essential git make gdb pkg-config curl ca-certificates gnupg xz-utils unzip
   libmotif-dev libxt-dev libx11-dev libxext-dev x11-utils x11-xserver-utils xvfb xdotool imagemagick
   xfce4 xfce4-terminal lightdm lightdm-gtk-greeter dbus-x11 xserver-xorg-core xserver-xorg-input-libinput
-  fonts-dejavu fonts-liberation mousepad locales
+  fonts-dejavu fonts-liberation mousepad locales zenity
   z80asm z80dasm sdcc pasmo cmake
   gcc-avr avr-libc binutils-avr avrdude
   picocom minicom socat lua5.4 xxd default-jre

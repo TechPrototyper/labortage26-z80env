@@ -78,6 +78,14 @@ Laden und starten im Emulator (so getestet, Programm läuft und schreibt „Hall
 3. Menü **File → Receive from File…**, Pfad zu `hello.bin` eingeben (z. B. `/home/<benutzer>/examples/hello.bin`, in der VM zeigt `echo ~/examples` den Ordner), **Ok** (erst *nach* `recv`, sonst geht die Datei verloren)
 4. Der Monitor zeigt den empfangenen Speicher ab `2000h`; Taste **`go`** startet das Programm
 
+## Anzeigegröße (für gute Lesbarkeit)
+
+Die VM startet in der Stufe **Groß** (1440×900, 144 dpi, größere Schrift, Panel und Symbole). Umstellen geht über den
+Starter **„Anzeigegröße“** auf dem VM-Desktop oder im Terminal mit `labzoom normal|gross|riesig` (Auswahl wird gemerkt).
+Bereits offene Programme (z. B. die IDE) danach neu starten. Kleiner Bildschirm (13") oder schwache Augen: `riesig`.
+Die Editor-Schrift ist auf 15 pt gesetzt (`~/.config/VSCodium/User/settings.json`, eigene Werte bleiben erhalten);
+die Vertrauensabfrage („Restricted Mode“) ist in der Lab-VM abgeschaltet.
+
 ## Bekannte Besonderheiten
 
 - `firmware.z8a` nutzt Syntax (`ixl`/`ixh`, `add c`), die Debians `z80asm` nicht übersetzt. In der VM steht

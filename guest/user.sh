@@ -64,4 +64,15 @@ mkdir -p "$(dirname "$cfg")"
 }
 JSON
 
+# Größere Editor-/Terminal-Schrift für gute Lesbarkeit (nur fehlende Schlüssel setzen, eigene Werte bleiben)
+python3 - "$cfg" <<'PY'
+import json, sys
+p = sys.argv[1]
+d = json.load(open(p))
+for k, v in {"editor.fontSize": 15, "terminal.integrated.fontSize": 14, "debug.console.fontSize": 14,
+             "editor.minimap.enabled": False, "window.zoomLevel": 0,
+             "security.workspace.trust.enabled": False}.items():
+    d.setdefault(k, v)
+json.dump(d, open(p, "w"), indent=2, ensure_ascii=False)
+PY
 log "user.sh fertig"
