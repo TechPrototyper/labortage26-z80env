@@ -24,10 +24,10 @@ fetch_image() {
   mv "$IMG.part" "$IMG"
 }
 
-# Halb angelegte Instanz (z.B. nach abgebrochenem Download) aufräumen
-if vm_exists && [ ! -f "$LIMA_HOME/$VM_NAME/diffdisk" ] && [ "$(vm_status)" = "Stopped" ]; then
-  warn "Unvollständige VM gefunden - lege sie neu an"
-  limactl delete --force "$VM_NAME"
+# Sicherheitsnetz: eine vorhandene VM wird NIE automatisch gelöscht. Ist sie unvollständig (keine Platte),
+# bricht das Skript mit einer Anleitung ab. (Lima nennt die Platte "disk" bei vz und "diffdisk" bei QEMU.)
+if vm_exists && [ ! -f "$LIMA_HOME/$VM_NAME/disk" ] && [ ! -f "$LIMA_HOME/$VM_NAME/diffdisk" ]; then
+  die "VM '$VM_NAME' ist unvollständig (keine Platte). Zum Neuaufbau bewusst ausführen: limactl unprotect $VM_NAME; limactl delete $VM_NAME - das löscht die VM samt Inhalt!"
 fi
 
 if vm_exists; then
@@ -39,6 +39,9 @@ else
     --set ".images = [{\"location\": \"$IMG\", \"arch\": \"aarch64\", \"digest\": \"sha512:$IMG_SHA\"}]" \
     "$LAB_DIR/lab.yaml"
 fi
+
+# Lima-Schutz gegen versehentliches "limactl delete" (idempotent)
+limactl protect "$VM_NAME" >/dev/null 2>&1 || true
 
 if vm_running; then
   log "VM läuft bereits"
