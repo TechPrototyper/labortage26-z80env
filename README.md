@@ -113,9 +113,9 @@ die Vertrauensabfrage („Restricted Mode“) ist in der Lab-VM abgeschaltet.
 
 ## Welches z80asm?
 
-`z80asm` im PATH ist ein Adapter, der `sjasmplus` aufruft. Als **Alternative** wird das echte `z80asm` aus dem Git-Repository von Savannah gebaut (`z80asm-git`,
-Version 1.9 vom 16.03.2021, nie als Release erschienen): Es versteht den unveränderten Makefile-Aufruf und liefert dieselbe Firmware (3632 Byte). Aufruf:
-`PATH=/opt/z80asm-git/bin:$PATH make`. Debians `z80asm` (Release 1.8 von 2009) übersetzt die Firmware nicht. Details: [`docs/VM.md`](docs/VM.md).
+Haupttool im PATH ist das echte `z80asm` aus dem Git-Repository von Savannah (`z80asm-git`, Version 1.9 vom 16.03.2021, nie als Release erschienen): Es versteht den
+unveränderten Makefile-Aufruf und liefert die Firmware (3632 Byte), byte-identisch zu `sjasmplus`. Danach im PATH: der unveränderte sjasmplus-Adapter als Rückfall.
+Debians `z80asm` (Release 1.8 von 2009) wird nicht installiert, es übersetzt die Firmware nicht. Details: [`docs/VM.md`](docs/VM.md).
 
 ## Zurücksetzen
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Als root: z80asm aus dem Git-Repository von Savannah (Bas Wijnen) als ALTERNATIVE. Nichts wird überschrieben:
-#   /opt/z80asm-git/bin/z80asm   die Alternative (nicht im PATH)
+#   /opt/z80asm-git/bin/z80asm   das Haupttool (im PATH vor dem Adapter)
 #   /usr/local/bin/z80asm-git    Verknüpfung darauf
 # Warum: Die letzte Release 1.8 (2009, = Debians Paket) kennt `inc ixl` & Co. nicht; im Git-Stand (1.9, 16.03.2021, nie als Release
 # erschienen) sind sie korrigiert. Dieser Stand versteht den unveränderten Makefile-Aufruf `z80asm -lfirmware.prn -o rom firmware.z8a`.
@@ -8,6 +8,13 @@
 set -euo pipefail
 export LC_ALL=C.UTF-8
 log() { printf '\033[1;34m  ->\033[0m %s\n' "$*"; }
+
+# Haupttool im PATH: z80asm-git vor /usr/local/bin (dort liegt der sjasmplus-Adapter "z80asm"); z88dk-Dateien bleiben unberührt
+cat > /etc/profile.d/z80asm-git.sh <<'PROFILE'
+# z80asm aus dem Savannah-Git (Haupttool); steht vor /usr/local/bin, wo der sjasmplus-Adapter z80asm liegt
+case ":$PATH:" in *":/opt/z80asm-git/bin:"*) ;; *) export PATH="/opt/z80asm-git/bin:$PATH" ;; esac
+PROFILE
+grep -q 'z80asm-git.sh' /etc/bash.bashrc || printf '\n[ -r /etc/profile.d/z80asm-git.sh ] && . /etc/profile.d/z80asm-git.sh\n' >> /etc/bash.bashrc
 
 COMMIT=0df4a46551adb0dd8abbb3c3b0442f6cb37c6cc2
 PREFIX=/opt/z80asm-git

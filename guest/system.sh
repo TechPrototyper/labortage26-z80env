@@ -15,7 +15,7 @@ REQUIRED="build-essential git make gdb pkg-config curl ca-certificates gnupg xz-
   libmotif-dev libxt-dev libx11-dev libxext-dev x11-utils x11-xserver-utils xvfb xdotool imagemagick
   xfce4 xfce4-terminal lightdm lightdm-gtk-greeter dbus-x11 xserver-xorg-core xserver-xorg-input-libinput
   fonts-dejavu fonts-liberation mousepad locales zenity chromium
-  z80asm z80dasm sdcc pasmo cmake
+  z80dasm sdcc pasmo cmake
   gcc-avr avr-libc binutils-avr avrdude
   picocom minicom socat lua5.4 xxd default-jre
   bison flex gzip clangd cppcheck
@@ -186,7 +186,7 @@ grep -q 'z88dk.sh' /etc/bash.bashrc || printf '\n[ -r /etc/profile.d/z88dk.sh ] 
 # Das Projekt-Makefile ruft `z80asm -l<Liste> -o <ROM> firmware.z8a` auf. Die Firmware nutzt
 # Syntax, die Debians z80asm (Bas Wijnen 1.8) und Udo Munks z80asm nicht übersetzen
 # (z.B. ixl/ixh, "add c"). sjasmplus übersetzt sie fehlerfrei; dieser Adapter übersetzt
-# den Aufruf, damit `make` unverändert funktioniert. Debians /usr/bin/z80asm bleibt unberührt.
+# den Aufruf. Haupttool im PATH ist inzwischen z80asm-git (Savannah); dieser Adapter bleibt unverändert als Rückfall unter /usr/local/bin/z80asm.
 cat > /usr/local/bin/z80asm <<'WRAP'
 #!/bin/sh
 # Adapter: z80asm-Aufruf des Labcomp-Makefiles -> sjasmplus

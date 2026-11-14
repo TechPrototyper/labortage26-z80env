@@ -2,6 +2,7 @@
 # e) Abnahmetest in der VM. Bricht beim ersten Fehler mit Exit-Code != 0 ab.
 set -euo pipefail
 export LC_ALL=C.UTF-8   # unabhängig von den Locale-Einstellungen der VM (Zahlenformat usw.)
+. /etc/profile.d/z80asm-git.sh   # wie in einer Login-Shell: z80asm-git vor dem Adapter
 cd "$HOME/Projects/labortage/labcomp"
 pass() { printf '\033[1;32m  PASS\033[0m %s\n' "$*"; }
 fail() { printf '\033[1;31m  FAIL\033[0m %s\n' "$*"; exit 1; }
@@ -26,7 +27,9 @@ grep -qE '^[[:space:]]+(ld|jp|jr|di|im)[[:space:]]' <<<"$dis" \
   && pass "ROM disassembliert sinnvoll (Reset-Vektor)" || fail "ROM-Disassembly"
 
 # 3. Weitere Toolchains
-[ "$(command -v z80asm)" = /usr/local/bin/z80asm ] && pass "z80asm-Adapter (sjasmplus)" || fail "z80asm-Adapter"
+[ "$(command -v z80asm)" = /opt/z80asm-git/bin/z80asm ] && pass "z80asm im PATH: Savannah-Version (Haupttool)" || fail "z80asm im PATH"
+[ -x /usr/local/bin/z80asm ] && grep -q sjasmplus /usr/local/bin/z80asm && pass "sjasmplus-Adapter unverändert vorhanden (Rückfall)" || fail "Adapter"
+! dpkg -s z80asm >/dev/null 2>&1 && pass "Debians Paket z80asm nicht installiert" || fail "Debians z80asm ist noch installiert"
 sjasmplus --version >/dev/null 2>&1 && pass "sjasmplus" || fail "sjasmplus"
 sdcc --version >/dev/null 2>&1 && pass "sdcc" || fail "sdcc"
 galasm -h >/dev/null 2>&1 || galasm 2>&1 | grep -qi galasm && pass "galasm" || fail "galasm"
