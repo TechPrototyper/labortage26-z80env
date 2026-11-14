@@ -7,6 +7,8 @@ Gedacht für die Labortage 26 – für alle, die einen Mac, aber keine Linux-Umg
 Kein XQuartz, keine VM-Lizenz: die VM läuft mit [Lima](https://lima-vm.io) auf Apples
 Virtualization.framework (schnell, sparsam, Fenster direkt auf dem Mac).
 
+Eine Kurzdoku der fertigen VM (Ordner, Werkzeuge, Alltag) steht in [`docs/VM.md`](docs/VM.md).
+
 ## Voraussetzungen
 
 - Mac mit Apple Silicon, macOS 13 oder neuer
