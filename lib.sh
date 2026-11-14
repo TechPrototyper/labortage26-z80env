@@ -4,6 +4,10 @@ set -euo pipefail
 LAB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Das Labcomp-Projekt, das in der VM geklont wird (überschreibbar, z.B. für einen eigenen Fork).
 LABCOMP_REPO_URL="${LABCOMP_REPO_URL:-https://git.gay/ayron/labcomp}"
+# Dieses Repository selbst (wird ebenfalls in die VM geklont, enthält examples/).
+LAB_ENV_REPO_URL="${LAB_ENV_REPO_URL:-https://github.com/TechPrototyper/labortage26-z80env.git}"
+# Mac-Ordner mit deinem eigenen Code; erscheint in der VM als ~/Projects/labortage/code und überlebt jeden VM-Neuaufbau.
+LAB_CODE_DIR="${LAB_CODE_DIR:-$HOME/LabShare/code}"
 VM_NAME="${VM_NAME:-lab}"
 export LIMA_HOME="${LIMA_HOME:-$HOME/.lima}"
 for p in /opt/homebrew/bin /usr/local/bin; do

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Läuft als root in der VM. Idempotent: alles prüft vorher, was schon da ist.
 set -euo pipefail
+export LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 : "${LAB_USER:?LAB_USER fehlt}"
 
@@ -18,7 +19,7 @@ REQUIRED="build-essential git make gdb pkg-config curl ca-certificates gnupg xz-
   gcc-avr avr-libc binutils-avr avrdude
   picocom minicom socat lua5.4 xxd default-jre
   bison flex gzip clangd cppcheck
-  libxml2-dev zlib1g-dev m4 ragel re2c dos2unix texinfo perl cpanminus libgmp-dev ccache
+  libxml2-dev zlib1g-dev m4 ragel re2c dos2unix texinfo perl cpanminus libgmp-dev ccache libboost-dev libboost-graph-dev
   libmodern-perl-perl libyaml-perl liblocal-lib-perl libcapture-tiny-perl libpath-tiny-perl libtext-table-perl
   libdata-hexdump-perl libregexp-common-perl libclone-perl libfile-slurp-perl libtemplate-perl libcpan-meta-perl"
 # Optional/großzügig: nicht vorhandene Pakete werden übersprungen und gemeldet.
@@ -49,11 +50,25 @@ printf '%s\n' "${skipped[@]:-}" > /var/lib/lab/skipped-packages.txt
 apt-get purge -y -qq xfce4-screensaver light-locker 2>/dev/null || true
 
 # ------------------------------------------------------------ Locale/Tastatur
-if ! locale -a | grep -qi '^de_DE.utf8'; then
-  sed -i 's/^# *\(de_DE.UTF-8\)/\1/; s/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen
+# Meldungen und Programmsprache: Englisch (en_US.UTF-8). Deutsch bleiben die Tastatur (de, siehe unten) sowie
+# Zahlen-, Datums- und Währungsformat, Maßeinheiten und Papierformat (LC_*=de_DE.UTF-8).
+if ! locale -a | grep -qi '^en_US.utf8' || ! locale -a | grep -qi '^de_DE.utf8'; then
+  sed -i 's/^# *\(de_DE.UTF-8 UTF-8\)/\1/; s/^# *\(en_US.UTF-8 UTF-8\)/\1/' /etc/locale.gen
   locale-gen >/dev/null
 fi
-update-locale LANG=de_DE.UTF-8 >/dev/null
+want_locale='LANG=en_US.UTF-8
+LC_NUMERIC=de_DE.UTF-8
+LC_TIME=de_DE.UTF-8
+LC_MONETARY=de_DE.UTF-8
+LC_PAPER=de_DE.UTF-8
+LC_MEASUREMENT=de_DE.UTF-8
+LC_NAME=de_DE.UTF-8
+LC_ADDRESS=de_DE.UTF-8
+LC_TELEPHONE=de_DE.UTF-8'
+if [ "$(cat /etc/default/locale 2>/dev/null)" != "$want_locale" ]; then
+  printf '%s\n' "$want_locale" > /etc/default/locale
+  echo 1 > /var/lib/lab/needs-reboot      # neue Anmeldung/Neustart nötig, damit die Sitzung es übernimmt
+fi
 cat > /etc/default/keyboard <<'KBD'
 XKBMODEL="pc105"
 XKBLAYOUT="de"
@@ -132,7 +147,7 @@ build_from_git galasm    https://github.com/daveho/GALasm   eeb06645a5ef4a2fd456
 # ------------------------------------------------------------------- z88dk
 # Z80-Standardtoolkit (zcc, sccz80, z80asm, appmake, Bibliotheken u.a. für TRS-80).
 # Aus gepinnter Version gebaut, Installation in /opt/z88dk (dauert beim ersten Mal ~20 Min).
-# Ohne zsdcc (SDCC-Fork, kostet noch einmal ~30 Min): Standardcompiler sccz80 funktioniert.
+# build.sh baut dabei auch zsdcc (SDCC-Fork) und braucht dafür die Boost-Header (libboost-*-dev oben).
 Z88DK_TAG=v2.5
 Z88DK_COMMIT=37960a1a59b527839024992d6e3cc63772d5ba8f
 Z88DK_DIR=/opt/z88dk

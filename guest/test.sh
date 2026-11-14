@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # e) Abnahmetest in der VM. Bricht beim ersten Fehler mit Exit-Code != 0 ab.
 set -euo pipefail
-cd "$HOME/labcomp"
+export LC_ALL=C.UTF-8   # unabhängig von den Locale-Einstellungen der VM (Zahlenformat usw.)
+cd "$HOME/Projects/labortage/labcomp"
 pass() { printf '\033[1;32m  PASS\033[0m %s\n' "$*"; }
 fail() { printf '\033[1;31m  FAIL\033[0m %s\n' "$*"; exit 1; }
 
@@ -25,11 +26,13 @@ galasm -h >/dev/null 2>&1 || galasm 2>&1 | grep -qi galasm && pass "galasm" || f
 avr-gcc --version >/dev/null && pass "avr-gcc" || fail "avr-gcc"
 codium --version >/dev/null 2>&1 && pass "VSCodium $(codium --version 2>/dev/null | head -1)" || fail "codium"
 codium --list-extensions 2>/dev/null | grep -qix mborik.z80-macroasm && pass "Erweiterung z80-macroasm" || fail "Erweiterung z80-macroasm"
-if [ -f /tmp/trszog.vsix ]; then
-  codium --list-extensions --show-versions 2>/dev/null | grep -qiE '^techprototyper\.dezog@.*trs80' \
-    && pass "trszog installiert ($(codium --list-extensions --show-versions 2>/dev/null | grep -i '^techprototyper.dezog@'))" || fail "trszog"
+# DeZog-Variante prüfen anhand der installierten Erweiterung (nicht an /tmp: das wird beim Neustart geleert)
+if codium --list-extensions --show-versions 2>/dev/null | grep -qiE '^techprototyper\.dezog@.*trs80'; then
+  pass "trszog installiert ($(codium --list-extensions --show-versions 2>/dev/null | grep -i '^techprototyper.dezog@'))"
+elif codium --list-extensions 2>/dev/null | grep -qix maziac.dezog; then
+  pass "DeZog (Original) installiert"
 else
-  codium --list-extensions 2>/dev/null | grep -qix maziac.dezog && pass "DeZog (Original) installiert" || fail "DeZog"
+  fail "weder trszog noch DeZog installiert"
 fi
 # Werkzeuge
 . /etc/profile.d/z88dk.sh
@@ -54,19 +57,21 @@ rm -rf "$tdir"
 
 # 3c. Beispiel aus ~/examples assemblieren (26 Byte: 4 Byte recv-Kopf + 22 Byte Programm)
 tdir2="$(mktemp -d)"
-(cd "$HOME/examples" && sjasmplus --nologo --dirbol --raw="$tdir2/hello.bin" hello.z8a >/dev/null 2>&1) \
+(cd "$HOME/Projects/labortage/labortage26-z80env/examples" && sjasmplus --nologo --dirbol --raw="$tdir2/hello.bin" hello.z8a >/dev/null 2>&1) \
   && [ "$(stat -c %s "$tdir2/hello.bin")" = 26 ] && pass "Beispiel hello.z8a assembliert (26 Byte)" || fail "Beispiel hello.z8a"
 [ -f "$HOME/Lab.code-workspace" ] && pass "Workspace-Datei vorhanden" || fail "Workspace-Datei"
+code="$HOME/Projects/labortage/code"
+[ -L "$code" ] && touch "$code/.write-test" && rm -f "$code/.write-test" && pass "code/ ist beschreibbar (liegt auf dem Mac: $(readlink "$code"))" || fail "code/ Verknüpfung"
 rm -rf "$tdir2"
 
-zoom_out="$("$HOME/.local/bin/labzoom" bogus 2>&1 || true)"
+zoom_out="$(labzoom bogus 2>&1 || true)"
 grep -q usage <<<"$zoom_out" && pass "labzoom vorhanden" || fail "labzoom"
 
 # 4. Emulator startet unter virtuellem X-Server, läuft stabil und reagiert auf Tastendruck:
 #    LCD-Ausschnitt vor/nach Klick auf "PC" muss sich unterscheiden (Firmware läuft im Emulator).
 cat > /tmp/emu-ui-test.sh <<'UI'
 set -e
-cd "$HOME/labcomp"
+cd "$HOME/Projects/labortage/labcomp"
 ./labcomp_emu >emu.log 2>&1 & pid=$!
 trap 'kill $pid 2>/dev/null || true' EXIT
 sleep 5

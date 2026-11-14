@@ -1,26 +1,40 @@
 #!/usr/bin/env bash
-# d) Repo in der VM bereitstellen (idempotent: klont beim ersten Mal, danach fast-forward Pull).
+# d) Projektverzeichnisse in der VM einrichten (idempotent):
+#   ~/Projects/labortage/labcomp               geklontes Labcomp-Projekt
+#   ~/Projects/labortage/labortage26-z80env    dieses Repository (enthält examples/)
+#   ~/Projects/labortage/code                  Verknüpfung auf den Mac-Ordner $LAB_CODE_DIR (eigener Code, bleibt erhalten)
 source "$(dirname "$0")/lib.sh"
 vm_running || die "VM läuft nicht - erst 02-vm.sh"
-REMOTE="$LABCOMP_REPO_URL"
 
-vm_sh bash -s "$REMOTE" <<'GUEST'
+# Mac-Ordner für eigenen Code anlegen und mit einem Startbeispiel füllen (vorhandene Dateien bleiben unangetastet)
+mkdir -p "$LAB_CODE_DIR/.vscode"
+cp -n "$LAB_DIR/examples/hello.z8a" "$LAB_CODE_DIR/hello.z8a" 2>/dev/null || true
+cp -n "$LAB_DIR/examples/.vscode/tasks.json" "$LAB_CODE_DIR/.vscode/tasks.json" 2>/dev/null || true
+case "$LAB_CODE_DIR" in
+  "$HOME/LabShare"/*|"$HOME/LabShare") ;;
+  *) warn "LAB_CODE_DIR liegt außerhalb von ~/LabShare - dann muss der Ordner in lab.yaml als Mount eingetragen sein" ;;
+esac
+
+vm_sh bash -s "$LABCOMP_REPO_URL" "$LAB_ENV_REPO_URL" <<'GUEST'
 set -euo pipefail
-remote="$1"; dir="$HOME/labcomp"
-if [ -d "$dir/.git" ]; then
-  echo "  -> Repo vorhanden, aktualisiere"
-  git -C "$dir" pull --ff-only
-else
-  echo "  -> Klone $remote"
-  git clone "$remote" "$dir"
-fi
-git -C "$dir" log --oneline -1
+base="$HOME/Projects/labortage"
+mkdir -p "$base"
+clone_or_pull() { # url dir
+  if [ -d "$2/.git" ]; then
+    echo "  -> $(basename "$2") vorhanden, aktualisiere"
+    git -C "$2" pull --ff-only
+  else
+    echo "  -> Klone $1"
+    git clone "$1" "$2"
+  fi
+  git -C "$2" log --oneline -1
+}
+clone_or_pull "$1" "$base/labcomp"
+clone_or_pull "$2" "$base/labortage26-z80env"
+# Verknüpfung auf den Mac-Ordner (virtiofs-Mount /mnt/labshare)
+ln -sfn /mnt/labshare/code "$base/code"
+[ -d "$base/code" ] || { echo "  !! $base/code zeigt ins Leere - ist der Mount /mnt/labshare vorhanden?" >&2; exit 1; }
 GUEST
-
-# Beispiele aus diesem Repo nach ~/examples in der VM (idempotent: wird überschrieben)
-log "Beispiele nach ~/examples kopieren"
-vm_sh bash -c 'mkdir -p "$HOME/examples"'
-limactl copy -r "$LAB_DIR/examples/." "$VM_NAME:examples/"
 
 log "Desktop-Starter"
 vm_sh bash -s < "$LAB_DIR/guest/desktop.sh"

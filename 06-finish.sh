@@ -6,7 +6,7 @@ source "$(dirname "$0")/lib.sh"
 LOGO="$HOME/.cache/lab/LaborLogo.xbm"
 if vm_running; then
   mkdir -p "$(dirname "$LOGO")"
-  limactl copy "$VM_NAME:labcomp/LaborLogo.xbm" "$LOGO" 2>/dev/null || true
+  limactl copy "$VM_NAME:Projects/labortage/labcomp/LaborLogo.xbm" "$LOGO" 2>/dev/null || true
 fi
 
 if [ "${LAB_NO_STOP:-0}" = 1 ]; then

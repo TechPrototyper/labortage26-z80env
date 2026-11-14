@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 # Läuft als Lab-Benutzer, nachdem das Repo geklont ist: Desktop-Starter mit Logo-Icon, als vertrauenswürdig markiert.
 set -euo pipefail
+export LC_ALL=C.UTF-8
 log() { printf '\033[1;34m  ->\033[0m %s\n' "$*"; }
 
 mkdir -p "$HOME/Desktop" "$HOME/.local/share/icons"
 icon="$HOME/.local/share/icons/labcomp.png"
-convert "$HOME/labcomp/LaborLogo.xbm" -negate -resize 128x128 -background '#1b2a49' -gravity center -extent 160x160 "$icon" 2>/dev/null || true
+convert "$HOME/Projects/labortage/labcomp/LaborLogo.xbm" -negate -resize 128x128 -background '#1b2a49' -gravity center -extent 160x160 "$icon" 2>/dev/null || true
 [ -f "$icon" ] || icon=utilities-terminal
 
 # --- Anzeigegröße: Skript "labzoom" mit drei Stufen (Auflösung + DPI + Schrift + Panel/Symbole) ---
 mkdir -p "$HOME/.local/bin" "$HOME/.config/labzoom" "$HOME/.config/autostart"
-cat > "$HOME/.local/bin/labzoom" <<'ZOOM'
+cat > "$HOME/.labzoom.tmp" <<'ZOOM'
 #!/bin/bash
 # labzoom [normal|gross|riesig|pick|apply]
 #   normal : 1920x1200, 120 dpi   (viel Platz)
@@ -51,12 +52,14 @@ xq xfce4-panel /panels/panel-2/size uint "$dock"
 xq xfce4-desktop /desktop-icons/icon-size uint "$icons"
 echo "Anzeigegröße: $cmd ($mode, $dpi dpi). Bereits offene Programme (z.B. die IDE) bitte neu starten."
 ZOOM
-chmod 755 "$HOME/.local/bin/labzoom"
+# systemweit installieren (/usr/local/bin ist immer im PATH, ~/.local/bin erst nach neuer Anmeldung)
+sudo install -m 755 "$HOME/.labzoom.tmp" /usr/local/bin/labzoom
+rm -f "$HOME/.labzoom.tmp" "$HOME/.local/bin/labzoom"
 cat > "$HOME/.config/autostart/labzoom.desktop" <<AUTO
 [Desktop Entry]
 Type=Application
 Name=Anzeigegröße anwenden
-Exec=$HOME/.local/bin/labzoom apply
+Exec=/usr/local/bin/labzoom apply
 Terminal=false
 X-GNOME-Autostart-Phase=Initialization
 AUTO
@@ -65,8 +68,9 @@ AUTO
 cat > "$HOME/Lab.code-workspace" <<'WS'
 {
   "folders": [
-    { "name": "labcomp (Projekt)", "path": "labcomp" },
-    { "name": "examples (Beispiele)", "path": "examples" }
+    { "name": "code (liegt auf dem Mac)", "path": "Projects/labortage/code" },
+    { "name": "labcomp (Projekt)", "path": "Projects/labortage/labcomp" },
+    { "name": "examples (Beispiele)", "path": "Projects/labortage/labortage26-z80env/examples" }
   ]
 }
 WS
@@ -84,11 +88,11 @@ StartupNotify=false
 DESK
   chmod +x "$f"
 }
-mk labcomp-emu     "Labcomp Emulator"      "sh -c 'cd \$HOME/labcomp && exec ./labcomp_emu'" "$icon"
+mk labcomp-emu     "Labcomp Emulator"      "sh -c 'cd \$HOME/Projects/labortage/labcomp && exec ./labcomp_emu'" "$icon"
 mk labcomp-ide     "Labcomp IDE"           "codium \$HOME/Lab.code-workspace"               vscodium
-mk labcomp-logisim "Logisim (Schaltplan)"  "sh -c 'cd \$HOME/labcomp && exec logisim AddrDec.circ'" applications-engineering
-mk labcomp-zoom     "Anzeigegröße"          "$HOME/.local/bin/labzoom pick"                    preferences-desktop-font
-mk labcomp-term    "Terminal"              "xfce4-terminal --working-directory=\$HOME/labcomp" utilities-terminal
+mk labcomp-logisim "Logisim (Schaltplan)"  "sh -c 'cd \$HOME/Projects/labortage/labcomp && exec logisim AddrDec.circ'" applications-engineering
+mk labcomp-zoom     "Anzeigegröße"          "/usr/local/bin/labzoom pick"                         preferences-desktop-font
+mk labcomp-term    "Terminal"              "xfce4-terminal --working-directory=\$HOME/Projects/labortage/labcomp" utilities-terminal
 
 # Als vertrauenswürdig markieren (sonst fragt XFCE bei jedem Start nach). Braucht den Session-Bus.
 bus="/run/user/$(id -u)/bus"
@@ -104,4 +108,4 @@ fi
 log "Desktop-Starter angelegt"
 
 # Gewählte Anzeigegröße sofort in der laufenden Sitzung anwenden (nicht kritisch, wenn keine Sitzung läuft)
-"$HOME/.local/bin/labzoom" apply || true
+/usr/local/bin/labzoom apply || true
