@@ -20,7 +20,7 @@ GUEST
 # Beispiele aus diesem Repo nach ~/examples in der VM (idempotent: wird überschrieben)
 log "Beispiele nach ~/examples kopieren"
 vm_sh bash -c 'mkdir -p "$HOME/examples"'
-limactl copy "$LAB_DIR"/examples/* "$VM_NAME:examples/"
+limactl copy -r "$LAB_DIR/examples/." "$VM_NAME:examples/"
 
 log "Desktop-Starter"
 vm_sh bash -s < "$LAB_DIR/guest/desktop.sh"

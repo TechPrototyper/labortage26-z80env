@@ -52,6 +52,13 @@ printf '\torg 5200h\nstart:\tld a,1\n\tret\n\tend start\n' > "$tdir/t.asm"
   && pass "zmac -j erzeugt .cmd und .bds" || fail "zmac -j"
 rm -rf "$tdir"
 
+# 3c. Beispiel aus ~/examples assemblieren (26 Byte: 4 Byte recv-Kopf + 22 Byte Programm)
+tdir2="$(mktemp -d)"
+(cd "$HOME/examples" && sjasmplus --nologo --dirbol --raw="$tdir2/hello.bin" hello.z8a >/dev/null 2>&1) \
+  && [ "$(stat -c %s "$tdir2/hello.bin")" = 26 ] && pass "Beispiel hello.z8a assembliert (26 Byte)" || fail "Beispiel hello.z8a"
+[ -f "$HOME/Lab.code-workspace" ] && pass "Workspace-Datei vorhanden" || fail "Workspace-Datei"
+rm -rf "$tdir2"
+
 # 4. Emulator startet unter virtuellem X-Server, läuft stabil und reagiert auf Tastendruck:
 #    LCD-Ausschnitt vor/nach Klick auf "PC" muss sich unterscheiden (Firmware läuft im Emulator).
 cat > /tmp/emu-ui-test.sh <<'UI'

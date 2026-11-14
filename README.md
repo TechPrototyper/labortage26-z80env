@@ -68,11 +68,14 @@ cd ~/examples   # in der VM
 sjasmplus --nologo --dirbol --raw=hello.bin hello.z8a
 ```
 
+Die IDE-Starter öffnen den Workspace `~/Lab.code-workspace` mit **beiden** Ordnern (`labcomp` und `examples`). In `examples/`
+baut **Strg+Shift+B** die gerade geöffnete `.z8a`-Datei mit sjasmplus (Fehler erscheinen im Problems-Panel).
+
 Laden und starten im Emulator (so getestet, Programm läuft und schreibt „Hallo Labor!“ aufs LCD):
 
 1. `./labcomp_emu -extmem 62256` starten
 2. Taste **`recv`** drücken – der Monitor zeigt „receive“ und wartet
-3. Menü **File → Receive from File…**, Pfad zu `hello.bin` eingeben, **Ok** (erst *nach* `recv`, sonst geht die Datei verloren)
+3. Menü **File → Receive from File…**, Pfad zu `hello.bin` eingeben (z. B. `/home/<benutzer>/examples/hello.bin`, in der VM zeigt `echo ~/examples` den Ordner), **Ok** (erst *nach* `recv`, sonst geht die Datei verloren)
 4. Der Monitor zeigt den empfangenen Speicher ab `2000h`; Taste **`go`** startet das Programm
 
 ## Bekannte Besonderheiten

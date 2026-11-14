@@ -8,6 +8,16 @@ icon="$HOME/.local/share/icons/labcomp.png"
 convert "$HOME/labcomp/LaborLogo.xbm" -negate -resize 128x128 -background '#1b2a49' -gravity center -extent 160x160 "$icon" 2>/dev/null || true
 [ -f "$icon" ] || icon=utilities-terminal
 
+# Workspace mit Projekt und Beispielen, damit beides in der IDE sichtbar ist
+cat > "$HOME/Lab.code-workspace" <<'WS'
+{
+  "folders": [
+    { "name": "labcomp (Projekt)", "path": "labcomp" },
+    { "name": "examples (Beispiele)", "path": "examples" }
+  ]
+}
+WS
+
 mk() { # mk <Datei> <Name> <Exec> <Icon>
   f="$HOME/Desktop/$1.desktop"
   cat > "$f" <<DESK
@@ -22,7 +32,7 @@ DESK
   chmod +x "$f"
 }
 mk labcomp-emu     "Labcomp Emulator"      "sh -c 'cd \$HOME/labcomp && exec ./labcomp_emu'" "$icon"
-mk labcomp-ide     "Labcomp IDE"           "codium \$HOME/labcomp"                           vscodium
+mk labcomp-ide     "Labcomp IDE"           "codium \$HOME/Lab.code-workspace"               vscodium
 mk labcomp-logisim "Logisim (Schaltplan)"  "sh -c 'cd \$HOME/labcomp && exec logisim AddrDec.circ'" applications-engineering
 mk labcomp-term    "Terminal"              "xfce4-terminal --working-directory=\$HOME/labcomp" utilities-terminal
 
