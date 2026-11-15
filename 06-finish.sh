@@ -71,7 +71,24 @@ if [ "\$(limactl list --format '{{.Status}}' "\$VM" 2>/dev/null)" = "Running" ];
 fi
 note "Lab-VM wird gestartet ..."
 mkdir -p "\$HOME/LabShare"
-if limactl start --tty=false "\$VM" >>"\$LOG" 2>&1; then
+# labvm (falls vorhanden): packt die Platte beim Start aus und nach dem Beenden der VM wieder ein (zstd)
+LABVM="\$HOME/Projects/labortage/bin/labvm"
+if [ -x "\$LABVM" ]; then
+  "\$LABVM" run "\$VM" >>"\$LOG" 2>&1 &
+  RUNPID=\$!
+  for i in \$(seq 100); do
+    [ "\$(limactl list --format '{{.Status}}' "\$VM" 2>/dev/null)" = "Running" ] && break
+    kill -0 \$RUNPID 2>/dev/null || break
+    sleep 3
+  done
+  if [ "\$(limactl list --format '{{.Status}}' "\$VM" 2>/dev/null)" = "Running" ]; then
+  note "Lab-VM läuft."
+    wait \$RUNPID
+  else
+  osascript -e 'display dialog "Die Lab-VM konnte nicht gestartet werden. Details: ~/Library/Logs/StartLab.log" buttons {"OK"} with icon stop' >/dev/null 2>&1
+  exit 1
+  fi
+elif limactl start --tty=false "\$VM" >>"\$LOG" 2>&1; then
   note "Lab-VM läuft."
 else
   osascript -e 'display dialog "Die Lab-VM konnte nicht gestartet werden. Details: ~/Library/Logs/StartLab.log" buttons {"OK"} with icon stop' >/dev/null 2>&1

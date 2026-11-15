@@ -24,6 +24,13 @@ fetch_image() {
   mv "$IMG.part" "$IMG"
 }
 
+# Gepackte Platte (labvm pack, zstd) vor dem Start wieder auspacken
+if vm_exists && [ -L "$LIMA_HOME/$VM_NAME/disk" ] && [ -f "$LIMA_HOME/$VM_NAME/disk.zst" ]; then
+  LABVM="$HOME/Projects/labortage/bin/labvm"
+  [ -x "$LABVM" ] || die "VM '$VM_NAME' ist gepackt (disk.zst), labvm fehlt. Manuell: rm ~/.lima/$VM_NAME/disk && zstd -d --sparse ~/.lima/$VM_NAME/disk.zst -o ~/.lima/$VM_NAME/disk"
+  "$LABVM" unpack "$VM_NAME"
+fi
+
 # Sicherheitsnetz: eine vorhandene VM wird NIE automatisch gelöscht. Ist sie unvollständig (keine Platte),
 # bricht das Skript mit einer Anleitung ab. (Lima nennt die Platte "disk" bei vz und "diffdisk" bei QEMU.)
 if vm_exists && [ ! -f "$LIMA_HOME/$VM_NAME/disk" ] && [ ! -f "$LIMA_HOME/$VM_NAME/diffdisk" ]; then
